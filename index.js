@@ -48,6 +48,22 @@ app.get("/download", async (req, res) => {
   }
 });
 
+app.get("/getinfo", async (req,res) => {
+  const videoUrl = req.query.url
+
+  if(!videoUrl){
+    res.send(400).json({error:"you have to have a video url"})
+  }
+
+  ytdl.getInfo(videoUrl,(error,info)=>{
+    if (error) {
+      console.log("Error:",error)
+      res.send(400).json({error : "There was an error getting info"})
+    }
+    return res.json(info)
+  })
+})
+
 const port = 3000;
 
 app.listen(port, () => {

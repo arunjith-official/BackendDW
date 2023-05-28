@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const ytdl = require("ytdl-core");
+const { promisify } = require("util");
 
 app.get("/download", async (req, res) => {
   const videoUrl = req.query.url;
@@ -48,21 +49,24 @@ app.get("/download", async (req, res) => {
   }
 });
 
-app.get("/getinfo", async (req,res) => {
-  const videoUrl = req.query.url
+app.get("/getinfo", async (req, res) => {
+  const videoUrl = req.query.url;
 
-  if(!videoUrl){
-    res.send(400).json({error:"you have to have a video url"})
+  if (!videoUrl) {
+    res.status(400).json({ error: "you have to have a video url" });
   }
 
-  ytdl.getInfo(videoUrl,(error,info)=>{
-    if (error) {
-      console.log("Error:",error)
-      res.send(400).json({error : "There was an error getting info"})
-    }
-    return res.json(info)
-  })
-})
+  try {
+    const getInfoPromise = promisify(ytdl.getInfo);
+    const info = await getInfoPromise(videoUrl);
+    return res.json(info);
+  } catch (error) {
+    console.log("Error:", error);
+    res.status(400).json({ error: "Info cannot be obtained" });
+  }
+});
+
+
 
 const port = 3000;
 

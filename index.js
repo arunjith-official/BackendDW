@@ -58,15 +58,15 @@ app.get("/getinfo", async (req, res) => {
 
   try {
     const getInfoPromise = promisify(ytdl.getInfo);
+    console.log("before getinfo");
     const info = await getInfoPromise(videoUrl);
+    console.log("after getinfo");
     return res.json(info);
   } catch (error) {
     console.log("Error:", error);
     res.status(400).json({ error: "Info cannot be obtained" });
   }
 });
-
-
 
 const port = 3000;
 

@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 const ytdl = require("ytdl-core");
-const { promisify } = require("util");
+const axios = require("axios")
+const cheerio = require("cheerio")
 
 app.get("/download", async (req, res) => {
   const videoUrl = req.query.url;
@@ -30,6 +31,7 @@ app.get("/download", async (req, res) => {
             .json({ error: "video url is not present in this post" });
         }
         // Downloading the video
+        console.log("pass")
         const videoResponse = await axios.get(videoSrc, {
           responseType: "stream",
         });
@@ -57,10 +59,7 @@ app.get("/getinfo", async (req, res) => {
   }
 
   try {
-    const getInfoPromise = promisify(ytdl.getInfo);
-    console.log("before getinfo");
-    const info = await getInfoPromise(videoUrl);
-    console.log("after getinfo");
+    const info = await ytdl.getInfo(videoUrl)
     return res.json(info);
   } catch (error) {
     console.log("Error:", error);

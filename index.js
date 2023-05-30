@@ -15,6 +15,7 @@ app.get("/download", async (req, res) => {
   }
   switch (platform) {
     case "instagram":
+      const newFileName = "original.mp4"
       try {
         //fetching content of the post (html)
         const response = await axios.get(videoUrl);
@@ -31,10 +32,10 @@ app.get("/download", async (req, res) => {
             .json({ error: "video url is not present in this post" });
         }
         // Downloading the video
-        console.log("pass")
         const videoResponse = await axios.get(videoSrc, {
           responseType: "stream",
         });
+        res.set('Content-Disposition','attachment; filename = original.mp4')
         videoResponse.data.pipe(res); //stream the videoResponse
       } catch (error) {
         console.log("Error:", error);

@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
 const ytdl = require("ytdl-core");
-const axios = require("axios")
-const cheerio = require("cheerio")
+const igdl = require('instagram-downloader');
+
 
 app.get("/download", async (req, res) => {
   const videoUrl = req.query.url;
@@ -15,34 +15,11 @@ app.get("/download", async (req, res) => {
   }
   switch (platform) {
     case "instagram":
-      const newFileName = "original.mp4"
-      try {
-        //fetching content of the post (html)
-        const response = await axios.get(videoUrl);
-        const html = response.data;
-
-        //parsing html content using cheerio
-        const $ = cheerio.load(html);
-
-        //extract video URL from the html
-        const videoSrc = $(`meta[property="og:video"]`).attr("content");
-        if (!videoSrc) {
-          return res
-            .status(400)
-            .json({ error: "video url is not present in this post" });
-        }
-        // Downloading the video
-        const videoResponse = await axios.get(videoSrc, {
-          responseType: "stream",
-        });
-        res.set('Content-Disposition','attachment; filename = original.mp4')
-        videoResponse.data.pipe(res); //stream the videoResponse
-      } catch (error) {
-        console.log("Error:", error);
-        res
-          .status(500)
-          .json({ error: "There was an error when downloading the video" });
-      }
+      igdl.downloadByUrl(videoUrl).then(downloadPath=>{
+        console.log('reel downlaoded successfully:', downloadPath)
+      }).catch(error => {
+        console.error("Error:",error)
+      })
       break;
     case "youtube":
       ytdl(videoUrl).pipe(res); // stream video as response
